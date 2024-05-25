@@ -1,0 +1,190 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&display=swap');
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Fira Sans', sans-serif;
+}
+
+body {
+  background: #ffffff;
+}
+
+header {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+header .navbar {
+  max-width: 1800px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffffec;
+  padding: 0px 15px;
+}
+
+.navbar .menu-links {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 30px;
+}
+
+.navbar .menu-links li a {
+  color: #000000;
+  font-weight: 500;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.navbar .menu-links .join-btn a {
+  border: 1px solid #000000;
+  padding: 8px 15px;
+  border-radius: 4px;
+}
+
+.navbar .menu-links .join-btn a:hover {
+  color: #050505;
+  border-color: #000000;
+  background: #f18e3c;
+}
+
+.hero-section {
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  display: flex;
+  padding-top: 10%;
+  padding-left: 15% ;
+  padding-right: 15%;
+  align-items: center;
+}
+
+.hero-section .content {
+  max-width: 1280px;
+  margin: auto 10px;
+  width: 100%;
+}
+
+.hero-section .content h1 {
+  color: #000000;
+  font-size: 3rem;
+  max-width: 630px;
+  line-height: 65px;
+}
+
+.hero-section .search-form {
+  height: 48px;
+  display: flex;
+  max-width: 630px;
+  margin-top: 30px;
+}
+
+.hero-section .search-form input {
+  height: 100%;
+  width: 100%;
+  background: rgb(252, 180, 122);
+  color: #ffffff;
+  border: none;
+  outline: none;
+  padding: 0 15px;
+  font-size: 1rem;
+  border-radius: 4px 0 0 4px;
+}
+
+.hero-section .search-form button {
+  height: 100%;
+  width: 60px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  background: #f7aa6b;
+  color: #ffffff;
+  border-radius: 0 4px 4px 0;
+  transition: background 0.2s ease;
+}
+
+.hero-section .search-form button:hover {
+  background: #f0832a;
+}
+
+.about{
+  padding-top: 10%;
+  padding-left: 23%;
+  display: flex;
+  align-items: center;
+ 
+}
+
+.about .image img{
+  width:100%;
+  height: auto;
+  padding-left: 20%;
+}
+
+.about .content h1{
+  font-size: 4.5rem;
+  padding-block-end: 1rem ;
+  color: var(--Very-Dark-Blue);
+  padding-left: 20%;
+}
+
+.about .content p{
+  font-size: medium;
+  max-width: 40rem;
+  color: var(--Grayish-Blue);
+  padding-left: 20%;
+}
+
+.cta {
+  background: linear-gradient(#f3b37e, rgba(66, 93, 139, 0.9)), url("image/Gate.jpg") fixed center center;
+  background-size: cover;
+  width: 70%;
+  height: auto;
+  padding: 17%;
+}
+
+.cta h3 {
+  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.cta p {
+  color: #fff;
+}
+
+@media (max-width: 1024px) {
+  .cta {
+    background-attachment: scroll;
+  }
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.column {
+  flex: 1;
+  padding: 30px;
+  margin: 10px;
+  border: 1px solid #000000;
+  text-align: justify;
+}
+
+.column h2 {
+  color: #333;
+}
+
+.column p {
+  color: #666;
+}
+
+
