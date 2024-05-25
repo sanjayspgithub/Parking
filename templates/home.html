@@ -1,0 +1,26 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static "css/style1.css" %}">
+</head>
+<body>
+<header>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="{% url 'Home' %}"> 
+                <img src="{% static "img/d1.ico" %}" alt="Logo"> 
+            </a>
+        </div>
+        <div class="buttons">
+            <a href="{% url 'login' %}"><input type="button" value="Log in"></a> 
+        </div>
+    </nav>
+    <div class="text-content">
+        <h2>Smart Campus Parking Management System</h2> 
+    </div>
+</header>
+</body>
+</html>

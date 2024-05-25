@@ -1,0 +1,155 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{% static "css/style.css" %}">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <a class="logo" href="{% url 'home2' %}"> 
+        <img src="{% static "img/d1.ico" %}" alt="raisoni"> 
+      </a>
+      <ul class="menu-links">
+        <li><a href="{% url 'home2' %}">Home</a></li> 
+     <li><a href="{% url 'visitordetail' %}">Visitor Detail</a></li> 
+        <li><a href="{% url 'visitor' %}">Visitor</a></li> 
+        <li><a href="{% url 'parkschedule' %}">Park Schedule</a></li> 
+        <li><a href="{% url 'tracevehicle' %}">Trace Vehicle</a></li> 
+        <li class="join-btn"><a href="{% url 'logout'%}">Sign Out</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <h2 style="margin-top: 130px; "> Live Tracking </h2>
+  <div style="display: flex; margin-top: 10px;margin-left: 20px; margin-bottom: 20px">
+      <video id="liveStream" autoplay style="width: 40%"></video>
+      <canvas id="canvas" style="display: none;"></canvas>
+    <div style="display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-content: center; margin-left: 50px">
+        <h2>Detection</h2>
+        <img src="" id="processedimage" height="250" width="450">
+        <br>
+        <img src="" id="croppedimage" height="100" width="400">
+        <label id="platetext" style="margin-top: 10px;font-weight: bold;">Detected Plate Number : <span style="color: green" id="platenum"></span> </label>
+
+    </div>
+  </div>
+  
+
+
+  <script src="{% static "js/footer.js" %}"></script> 
+  <script src="{% static "js/jquery.js" %}"></script> 
+  <script>
+        $(document).ready(function() {
+    var videoElement = document.getElementById('liveStream');
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+    var csrfToken = $('meta[name="csrf-token"]').attr('content'); // Get CSRF token
+    var isDetectionStopped = false; // Flag to track if number detection is stopped
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(function(stream) {
+          videoElement.srcObject = stream;
+      })
+      .catch(function(error) {
+          console.log('Error accessing webcam:', error);
+      });
+
+    var intervalId = setInterval(function() {
+        if (!isDetectionStopped) { // Proceed if detection is not stopped
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+            var imageData = canvas.toDataURL('image/jpeg');
+            sendFrame(imageData);
+        }
+    }, 1000);
+
+    function sendFrame(imageData) {
+        $.ajax({
+            type: 'POST',
+            url: 'video_feed/',
+            headers: {'X-CSRFToken': csrfToken},
+            data: {
+                'image_data': imageData
+            },
+            success: function(response) {
+                var img = 'http://localhost:8000/static/vehicletrace/processed_'+response.image_name
+                $("#processedimage").attr("src", img);
+                $("#croppedimage").attr("src", "");
+                if (response.plate_texts.length == 0){
+                    $("#platenum").html("No vehicle found")
+                    $("#platenum").css("color", "red")
+                    $("#croppedimage").hide()
+                } else {
+                    var pltnum = response.plate_texts[0]
+                    if (pltnum.length > 4) {
+                        var fil = (response.plate_texts[0].replace(/[^\w\s]|_/gi, '').replace(/\s+/g, '')).toUpperCase()
+                        $("#platenum").html(fil)
+                        $("#platenum").css("color", "green")
+                        $("#croppedimage").show()
+                        clearInterval(intervalId);
+                        isDetectionStopped = true; 
+                        var cimg = 'http://localhost:8000/static/vehicletrace/'+response.cropped
+                        $("#croppedimage").attr("src", cimg);
+
+                        setTimeout(function() {
+
+                            $.ajax({
+                                url: "/allotseat", 
+                                type: "POST", 
+                                headers: { "X-CSRFToken": csrfToken },
+                                dataType: 'json',
+                                data: {},
+                                success: function(output) {
+                                    if(output.status == 'success') {
+
+                                        alert("The available seat is : "+output.seat)
+                                        $.ajax({
+                                              url: "/addvehicle", 
+                                              type: "POST", 
+                                              headers: { "X-CSRFToken": csrfToken },
+                                              dataType: 'json',
+                                              data: {"vehiclenumber": fil},
+                                              success: function(output) {
+                                                  setTimeout(function() {
+                                                      location.href = "index/";
+                                                  }, 2000); 
+                                              },
+                                              error: function(xhr, status, error) {
+                                                  console.error('Error sending vehicle number:', error);
+                                              }
+                                          });
+                                    } else {
+                                        alert("Sorry the slot has filled! There is no available parking place found");  
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error('Error sending vehicle number:', error);
+                                }
+                            });
+
+                        }, 2000); 
+                        
+                        
+                    }
+                    
+                }
+                console.log(response.plate_texts[0])
+            },
+            error: function(xhr, status, error) {
+                console.error('Error sending frame:', error);
+            }
+        });
+    }
+});
+  </script>
+  
+</body>
+</html>

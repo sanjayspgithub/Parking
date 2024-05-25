@@ -1,0 +1,150 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="{% static "css/style.css" %}">
+<script  src="{% static 'js/jquery.js' %}"></script>
+<meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body>
+  <header>
+<nav class="navbar">
+  <a class="logo" href="{% url 'home2' %}"> 
+    <img src="{% static "img/d1.ico" %}" alt="raisoni">
+  </a>
+  <ul class="menu-links">
+     <li><a href="{% url 'home2' %}">Home</a></li> 
+     <li><a href="{% url 'visitordetail' %}">Visitor Details</a></li> 
+     <li><a href="{% url 'visitor' %}">Visitor</a></li> 
+     <li><a href="{% url 'parkschedule' %}">Park Schedule</a></li> 
+     <li><a href="{% url 'tracevehicle' %}">Trace Vehicle</a></li> 
+     <li class="join-btn"><a href="{% url 'logout' %}">Sign Out</a></li>
+  </ul>
+</nav>
+ <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+<div class="container">
+  <div class="column">
+      {% csrf_token %} 
+    <h2>Entry</h2>
+    <p>Vehicle entry section.</p><br>
+    <div style="max-height: 200px;
+    overflow-y: scroll;">
+
+        <table>
+        <thead>
+            <tr>
+                <th>S. No</th>
+                <th>Vehicle Number</th>
+                <th>In Time</th>
+                <th>Seat Number</th>
+            </tr>
+        </thead>
+        <tbody id="tbody">
+            
+        </tbody>
+    </table>
+      
+    </div>
+    
+  </div>
+  <div class="column">
+    <h2>Exit</h2>
+    <p>Vehicle exit section.</p>
+    <br><br>
+    <label>Exit Vehicle Number</label>
+    <input type="text" id="exitnum" name="" style="outline: none; border:1px solid black; padding: 12px; width: 200px">
+    <button id="exitbutton" style="cursor:pointer; padding: 12px; width: 100px; outline: none; border:none;background: rgb(241, 142, 60)">Exit</button>
+    </div>
+  </div>
+</div>
+</header>
+
+<script>
+  function signOut() {
+    sessionStorage.clear();
+    localStorage.clear();
+    window.location.href = "{% url 'Home' %}"; 
+  }
+</script>
+
+<script src='{% static "js/footer.js" %}'></script> 
+       <script>
+   $(document).ready(function () {
+
+      let csrfToken = $('meta[name="csrf-token"]').attr('content');
+      getactivehicle()
+      
+      $("#exitbutton").click(function(){
+
+        var exitnum = $("#exitnum").val()
+        if (exitnum == 0){
+            alert("Please enter exit number")
+        }else{
+
+           $.ajax({
+              url:"/exitvehicle", 
+              type: "POST", 
+              headers: { "X-CSRFToken": csrfToken },
+              dataType: 'json',
+              data: {"exitnum":exitnum},
+              success: function(output){
+                if(output.status == 'success'){
+                    alert(output.message)
+                    getactivehicle()
+                }else{
+                  alert("Pease try again")  
+                }
+                }
+          });
+
+        }
+
+      });
+
+      function getactivehicle(){
+        $.ajax({
+            url:"/activevehicle", 
+            type: "POST", 
+            headers: { "X-CSRFToken": csrfToken },
+            dataType: 'json',
+            data: {},
+            success: function(output){
+              var appenddata = ''
+              if (output.length > 0){
+               for(var i=0; i<=output.length-1; i++){
+                  appenddata += `<tr><td>`+(i+1)+`</td>
+                  <td>`+output[i]["vehiclenumber"]+`</td>
+                  <td>`+output[i]["intime"]+`</td>
+                  <td>`+output[i]["seatnum"]+`</td></tr>`
+               }}else{
+                appenddata = "<tr><td colspan=4 style='text-align:center'>No vehicle present on park!</tr>"
+               
+              }
+              $("#tbody").html(appenddata)
+                
+            }
+        });
+      }
+
+        
+   });
+</script>
+
+</body>
+</html>

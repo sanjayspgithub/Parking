@@ -1,0 +1,78 @@
+{%load static%}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <script  src="{% static 'js/jquery.js' %}"></script>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <a class="logo" href="{% url 'Home' %}"> 
+            <img src="{% static 'img/d1.ico' %}" alt="raisoni">
+        </a>
+        <ul class="menu-links">
+            <li><a href="{% url 'Home' %}">Home</a></li> 
+        </ul>
+    </nav>
+</header>
+
+<div class="container flex">
+    <div class="facebook-page flex">
+        <div class="image">
+            <img src="{% static 'img/ghrce.png' %}" alt="Image"> 
+        </div>
+        <form id="loginForm" method="POST"> 
+            {% csrf_token %} 
+            <input type="text" id="username" name="username" placeholder="Username" required> 
+            <input type="password" id="password" name="password" placeholder="Password" required> 
+            <div class="link">
+                <button type="button" id="handlelogin" class="login">Login</button>
+                <!-- <a href="#" class="forgot">Forgot password?</a> -->
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+   $(document).ready(function () {
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    
+
+       $("#handlelogin").click(function(){
+            var username = $("#username").val()
+            var password = $("#password").val()
+
+            if (username == '' || password == ''){
+                alert("Enter all the fields")
+            }else{
+                $.ajax({
+                    url:"login", 
+                    type: "POST", 
+                    headers: { "X-CSRFToken": csrfToken },
+                    dataType: 'json',
+                    data: {"username":username, "password":password},
+                    success: function(output){
+                        if (output['output'] == 0){
+                            alert('Username and Password do not match!')
+                        } else if (output['output'] == 1){
+                           location.href = 'index/'
+                        }
+                    }
+                });
+            }
+       });
+
+      
+   });
+</script>
+
+
+</body>
+</html>

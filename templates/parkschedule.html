@@ -1,0 +1,104 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{% static "css/style.css" %}">
+   <script  src="{% static 'js/jquery.js' %}"></script>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <a class="logo" href="index.html" >
+        <img src="{% static "img/d1.ico" %}" alt="raisoni">
+      </a>
+      <ul class="menu-links">
+        <li><a href="{% url 'home2' %}">Home</a></li> 
+        <li><a href="{% url 'visitordetail' %}">Visitor Detail</a></li> 
+        <li><a href="{% url 'visitor' %}">Visitor</a></li> 
+        <li><a href="{% url 'parkschedule' %}">Park Schedule</a></li>  
+        <li><a href="{% url 'tracevehicle' %}">Trace Vehicle</a></li> 
+        <li class="join-btn"><a href="{% url 'logout' %}">Sign Out</a></li>
+      </ul>
+    </nav>
+    <style type="text/css">
+        .grid-container {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          grid-template-rows: repeat(3, 1fr);
+          gap: 5px;
+      }
+
+      .grid-box {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 90%;
+          height: 60px;
+          border: 1px solid #ccc;
+          color: white;
+          margin-bottom: 20px;
+      }
+
+      .red {
+          background-color: red;
+      }
+
+      .green {
+          background-color: green;
+      }
+    </style>
+  </header>
+
+
+    <section style="top: 50%;
+    left: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 70%">
+
+    <h3  style="text-align: center;">Park Place Availability</h3><br><br>
+        {% csrf_token %} 
+      <div class="grid-container">
+      </div>
+
+    </section>
+
+    <script>
+
+      $(document).ready(function() {
+
+          let csrfToken = $('meta[name="csrf-token"]').attr('content');
+           $.ajax({
+              url:"/getallseatnum", 
+              type: "POST", 
+              headers: { "X-CSRFToken": csrfToken },
+              dataType: 'json',
+              data: {},
+              success: function(output){
+                present_seat_numbers_set = output.seats
+                for (var i = 1; i <= 15; i++) {
+                    var isPresent = present_seat_numbers_set.includes(i);
+                    var colorClass = isPresent ? 'red' : 'green';
+                    var seatNumber = i; 
+                    var $gridBox = $('<div class="grid-box ' + colorClass + '">');
+                    $gridBox.text("Seat : " + seatNumber);
+                    $('.grid-container').append($gridBox);
+                }
+              }  
+            });
+      });
+      function signOut() {    
+        sessionStorage.clear();
+        localStorage.clear(); 
+        window.location.href = "home.html"; 
+    }
+    </script>
+
+  <script src="{% static 'js/footer.js' %}"></script> 
+         
+</body>
+</html>

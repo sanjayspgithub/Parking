@@ -1,0 +1,118 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="{% static "css/style.css" %}">
+<script  src="{% static 'js/jquery.js' %}"></script>
+<meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body>
+  <header>
+<nav class="navbar">
+  <a class="logo" href="{% url 'home2' %}"> 
+    <img src="{% static "img/d1.ico" %}" alt="raisoni">
+  </a>
+  <ul class="menu-links">
+     <li><a href="{% url 'home2' %}">Home</a></li> 
+     <li><a href="{% url 'visitordetail' %}">Visitor Detail</a></li> 
+     <li><a href="{% url 'visitor' %}">Visitor</a></li> 
+     <li><a href="{% url 'parkschedule' %}">Park Schedule</a></li> 
+     <li><a href="{% url 'tracevehicle' %}">Trace Vehicle</a></li> 
+     <li class="join-btn"><a href="{% url 'logout' %}">Sign Out</a></li>
+  </ul>
+</nav>
+ <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+<div class="container">
+  <div class="column">
+      {% csrf_token %} 
+    <h2>Visitors</h2>
+    <p>Visitor detail section.</p><br>
+
+    <div style="max-height: 200px;
+    overflow-y: scroll;">
+        <table>
+        <thead>
+            <tr>
+                <th>S. No</th>
+                <th>Vistor Number</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Purpose</th>
+                <th>In Time</th>
+            </tr>
+        </thead>
+        <tbody id="tbody">
+            
+        </tbody>
+    </table>
+  </div>
+
+  </div>
+  </div>
+</div>
+</header>
+
+<script>
+  function signOut() {
+    sessionStorage.clear();
+    localStorage.clear();
+    window.location.href = "{% url 'Home' %}"; 
+  }
+</script>
+
+<script src='{% static "js/footer.js" %}'></script> 
+       <script>
+   $(document).ready(function () {
+
+      let csrfToken = $('meta[name="csrf-token"]').attr('content');
+      getactivisitors()
+
+      function getactivisitors(){
+        $.ajax({
+            url:"/getallvisitors", 
+            type: "POST", 
+            headers: { "X-CSRFToken": csrfToken },
+            dataType: 'json',
+            data: {},
+            success: function(output){
+              var appenddata = ''
+              if (output.length > 0){
+               for(var i=0; i<=output.length-1; i++){
+                  appenddata += `<tr><td>`+(i+1)+`</td>
+                  <td>`+output[i]["name"]+`</td>
+                  <td>`+output[i]["address"]+`</td>
+                  <td>`+output[i]["phone"]+`</td>
+                  <td>`+output[i]["purpose"]+`</td>
+                  <td>`+output[i]["visit_time"]+`</td></tr>`
+               }}else{
+                appenddata = "<tr><td colspan=6 style='text-align:center'>No visitors present!</tr>"
+               
+              }
+              $("#tbody").html(appenddata)
+                
+            }
+        });
+      }
+
+        
+   });
+</script>
+
+</body>
+</html>
